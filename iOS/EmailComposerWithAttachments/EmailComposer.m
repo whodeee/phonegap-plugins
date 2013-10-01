@@ -1,10 +1,22 @@
-//
+/**
+ * Email Composer plugin for PhoneGap/Cordova
+ * window.plugins.emailComposer
+ *
+ * Unified and updated API to be cross-platform by Gal Cohen in 2013.
+ * galcohen26@gmail.com
+ * https://github.com/GalCohen
+ *
+ * Originally created by Guido Sabatini in 2012.
+ * Original code from:
+ * android: https://github.com/phonegap/phonegap-plugins/tree/master/Android/EmailComposerWithAttachments
+ * ios https://github.com/phonegap/phonegap-plugins/tree/5cf45fcade4989668e95a6d34630d2021c45291a/iOS/SMSComposer
+ * js: https://github.com/phonegap/phonegap-plugins/blob/5cf45fcade4989668e95a6d34630d2021c45291a/iOS/SMSComposer/SMSComposer.js
+ *
+ */
+
 //  EmailComposer.m
 //
-//  Version 1.1
-//
-//  Created by Guido Sabatini in 2012.
-//
+//  Version 2.1
 
 #define RETURN_CODE_EMAIL_CANCELLED 0
 #define RETURN_CODE_EMAIL_SAVED 1
@@ -46,7 +58,7 @@
 }
 
 -(void) showEmailComposerWithParameters:(NSDictionary*)parameters {
-
+    
     MFMailComposeViewController *mailComposer = [[MFMailComposeViewController alloc] init];
     mailComposer.mailComposeDelegate = self;
     
@@ -60,7 +72,7 @@
     @catch (NSException *exception) {
         NSLog(@"EmailComposer - Cannot set subject; error: %@", exception);
     }
-
+    
     // set body
     @try {
         NSString* body = [parameters objectForKey:@"body"];
@@ -72,7 +84,7 @@
     @catch (NSException *exception) {
         NSLog(@"EmailComposer - Cannot set body; error: %@", exception);
     }
-	
+    
 	// Set recipients
     @try {
         NSArray* toRecipientsArray = [parameters objectForKey:@"toRecipients"];
@@ -83,7 +95,7 @@
     @catch (NSException *exception) {
         NSLog(@"EmailComposer - Cannot set TO recipients; error: %@", exception);
     }
-
+    
     @try {
         NSArray* ccRecipientsArray = [parameters objectForKey:@"ccRecipients"];
         if(ccRecipientsArray) {
@@ -93,7 +105,7 @@
     @catch (NSException *exception) {
         NSLog(@"EmailComposer - Cannot set CC recipients; error: %@", exception);
     }
-
+    
     @try {
         NSArray* bccRecipientsArray = [parameters objectForKey:@"bccRecipients"];
         if(bccRecipientsArray) {
@@ -103,19 +115,23 @@
     @catch (NSException *exception) {
         NSLog(@"EmailComposer - Cannot set BCC recipients; error: %@", exception);
     }
-
+    
 	@try {
         int counter = 1;
         NSArray *attachmentPaths = [parameters objectForKey:@"attachments"];
+        //added the following variable for attachment filename
+        NSString* attachmentFileName = [parameters objectForKey:@"fileNames"];
         if (attachmentPaths) {
             for (NSString* path in attachmentPaths) {
                 @try {
                     NSData *data = [[NSFileManager defaultManager] contentsAtPath:path];
-                    [mailComposer addAttachmentData:data mimeType:[self getMimeTypeFromFileExtension:[path pathExtension]] fileName:[NSString stringWithFormat:@"attachment%d.%@", counter, [path pathExtension]]];
+                    //added the following to add filename to attachment
+                    [mailComposer addAttachmentData:data mimeType:[self getMimeTypeFromFileExtension:[path pathExtension]] fileName:[NSString stringWithFormat:@"%1$@.%2$@", attachmentFileName, [path pathExtension]]];
+                    
                     counter++;
                 }
                 @catch (NSException *exception) {
-                    DLog(@"Cannot attach file at path %@; error: %@", path, exception);
+                    NSLog(@"Cannot attach file at path %@; error: %@", path, exception);
                 }
             }
         }
@@ -135,7 +151,7 @@
 
 // Dismisses the email composition interface when users tap Cancel or Send.
 // Proceeds to update the message field with the result of the operation.
-- (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {   
+- (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {
     // Notifies users about errors associated with the interface
 	int webviewResult = 0;
     
@@ -156,7 +172,7 @@
 			webviewResult = RETURN_CODE_EMAIL_NOTSENT;
             break;
     }
-	
+    
     [controller dismissModalViewControllerAnimated:YES];
     [self returnWithCode:webviewResult];
 }
@@ -176,7 +192,7 @@
     type = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension, NULL);
     
     // Converting UTI to a mime type
-   return (NSString *)UTTypeCopyPreferredTagWithClass(type, kUTTagClassMIMEType);
+    return (NSString *)UTTypeCopyPreferredTagWithClass(type, kUTTagClassMIMEType);
 }
 
 @end
