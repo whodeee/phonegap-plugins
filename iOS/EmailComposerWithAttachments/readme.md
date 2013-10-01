@@ -1,5 +1,8 @@
 # EmailComposer with attachments handling
 
+**Update: VERSION 1.1.1**
+Added functionality to show filenames in the attachments
+
 **Update: VERSION 1.1**
 Now the plugin can handle any type of attachments, not only images or PDFs
 
