@@ -35,7 +35,7 @@ Callable interface:
 
 or
 
-	window.plugins.emailComposer.showEmailComposer(subject,body,toRecipients,ccRecipients,bccRecipients,isHtml,attachments);
+	window.plugins.emailComposer.showEmailComposer(subject,body,toRecipients,ccRecipients,bccRecipients,isHtml,attachments,filenames);
 
 **Parameters:**
 - callback: a js function that will receive return parameter from the plugin
@@ -46,6 +46,7 @@ or
 - bccRecipients: a js array containing all the email addresses for BCC field; can be null/empty
 - isHtml: a bool value indicating if the body is HTML or plain text
 - attachments: a js array containing all full paths to the files you want to attach; can be null/empty
+- filenames: a js array containing all filenames to the files you want to attach associated with the attachments array; can be null/empty
 
 **Example**
 
